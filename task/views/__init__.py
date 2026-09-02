@@ -18,6 +18,10 @@ from task.views.task_views import (
 from task.views.comment_views import (
     api_task_comments,
 )
+from task.views.dashboard_views import (
+    index_view,
+    api_dashboard,
+)
 
 __all__ = [
     'api_register',
@@ -32,4 +36,6 @@ __all__ = [
     'api_task_detail',
     'api_overdue_tasks',
     'api_task_comments',
+    'index_view',
+    'api_dashboard',
 ]

@@ -1,0 +1,301 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race AI - Task Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="dark-theme">
+    <div id="app" class="app-container">
+        <!-- Top Navigation Header -->
+        <header class="app-header glass">
+            <div class="header-brand">
+                <div class="logo-icon">⚡</div>
+                <h1>Race Task Manager</h1>
+            </div>
+            
+            <div class="header-actions">
+                <div id="user-info-section" class="user-pill hidden">
+                    <span class="user-avatar" id="user-avatar">U</span>
+                    <span class="username-display" id="username-display">User</span>
+                    <button id="btn-logout" class="btn btn-sm btn-ghost">Logout</button>
+                </div>
+                <div id="auth-buttons-section">
+                    <button id="btn-show-login" class="btn btn-sm btn-secondary">Log In</button>
+                    <button id="btn-show-register" class="btn btn-sm btn-primary">Register</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content View -->
+        <main class="main-content">
+            <!-- Unauthenticated View / Welcome Banner -->
+            <section id="unauth-view" class="welcome-card glass">
+                <div class="welcome-content">
+                    <span class="badge badge-accent">Multi-User Task System</span>
+                    <h2>Streamline Projects & Teammate Workflow</h2>
+                    <p>Assign tasks, track status counts, monitor overdue work, and collaborate with your team.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-lg btn-primary" onclick="openAuthModal('register')">Get Started</button>
+                        <button class="btn btn-lg btn-secondary" onclick="openAuthModal('login')">Log In to Account</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Authenticated Workspace -->
+            <section id="auth-workspace" class="workspace hidden">
+                <!-- Control Toolbar & Filter Bar -->
+                <div class="toolbar glass">
+                    <div class="toolbar-left">
+                        <div class="select-wrapper">
+                            <label for="project-select">Active Project:</label>
+                            <select id="project-select" class="form-control">
+                                <option value="all">⚡ My Assigned Tasks (Dashboard)</option>
+                            </select>
+                        </div>
+                        <button id="btn-new-project" class="btn btn-sm btn-secondary">+ New Project</button>
+                        <button id="btn-edit-project" class="btn btn-sm btn-ghost hidden">Edit Project</button>
+                        <button id="btn-delete-project" class="btn btn-sm btn-danger-ghost hidden">Delete Project</button>
+                    </div>
+
+                    <div class="toolbar-right">
+                        <button id="btn-toggle-overdue" class="btn btn-sm btn-warning-outline">
+                            ⚠️ Overdue Filter (<span id="overdue-badge-count">0</span>)
+                        </button>
+                        <button id="btn-new-task" class="btn btn-sm btn-primary">+ Create Task</button>
+                    </div>
+                </div>
+
+                <!-- Project Metrics Bar (annotated Count summary) -->
+                <div id="project-metrics-bar" class="metrics-bar glass hidden">
+                    <div class="metric-item">
+                        <span class="metric-label">Total Tasks</span>
+                        <span class="metric-value" id="metric-total">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">To Do</span>
+                        <span class="metric-value text-todo" id="metric-todo">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">In Progress</span>
+                        <span class="metric-value text-inprogress" id="metric-inprogress">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Done</span>
+                        <span class="metric-value text-done" id="metric-done">0</span>
+                    </div>
+                </div>
+
+                <!-- 3-Column Kanban Board -->
+                <div class="kanban-board">
+                    <!-- TODO Column -->
+                    <div class="kanban-column glass" id="col-todo">
+                        <div class="column-header border-todo">
+                            <div class="column-title">
+                                <span class="dot dot-todo"></span>
+                                <h3>To Do</h3>
+                            </div>
+                            <span class="column-count" id="count-todo">0</span>
+                        </div>
+                        <div class="task-list" id="list-todo">
+                            <!-- Tasks populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- IN_PROGRESS Column -->
+                    <div class="kanban-column glass" id="col-inprogress">
+                        <div class="column-header border-inprogress">
+                            <div class="column-title">
+                                <span class="dot dot-inprogress"></span>
+                                <h3>In Progress</h3>
+                            </div>
+                            <span class="column-count" id="count-inprogress">0</span>
+                        </div>
+                        <div class="task-list" id="list-inprogress">
+                            <!-- Tasks populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- DONE Column -->
+                    <div class="kanban-column glass" id="col-done">
+                        <div class="column-header border-done">
+                            <div class="column-title">
+                                <span class="dot dot-done"></span>
+                                <h3>Done</h3>
+                            </div>
+                            <span class="column-count" id="count-done">0</span>
+                        </div>
+                        <div class="task-list" id="list-done">
+                            <!-- Tasks populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals & Drawers -->
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-backdrop hidden">
+        <div class="modal-card glass">
+            <button class="modal-close" onclick="closeModal('auth-modal')">&times;</button>
+            <h2 id="auth-modal-title">Sign In</h2>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="auth-username">Username</label>
+                    <input type="text" id="auth-username" class="form-control" required placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Password</label>
+                    <input type="password" id="auth-password" class="form-control" required placeholder="Enter password">
+                </div>
+                <div id="register-extra-fields" class="hidden">
+                    <div class="form-group">
+                        <label for="auth-email">Email</label>
+                        <input type="email" id="auth-email" class="form-control" placeholder="user@example.com">
+                    </div>
+                </div>
+                <div id="auth-error" class="alert alert-error hidden"></div>
+                <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block">Log In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Project Modal -->
+    <div id="project-modal" class="modal-backdrop hidden">
+        <div class="modal-card glass">
+            <button class="modal-close" onclick="closeModal('project-modal')">&times;</button>
+            <h2 id="project-modal-title">New Project</h2>
+            <form id="project-form">
+                <input type="hidden" id="project-id-input">
+                <div class="form-group">
+                    <label for="project-name-input">Project Name *</label>
+                    <input type="text" id="project-name-input" class="form-control" required placeholder="e.g. Website Redesign">
+                </div>
+                <div class="form-group">
+                    <label for="project-desc-input">Description</label>
+                    <textarea id="project-desc-input" class="form-control" rows="3" placeholder="Project goals and overview..."></textarea>
+                </div>
+                <div id="project-error" class="alert alert-error hidden"></div>
+                <button type="submit" class="btn btn-primary btn-block">Save Project</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal-backdrop hidden">
+        <div class="modal-card glass">
+            <button class="modal-close" onclick="closeModal('task-modal')">&times;</button>
+            <h2 id="task-modal-title">Create Task</h2>
+            <form id="task-form">
+                <input type="hidden" id="task-id-input">
+                <div class="form-group">
+                    <label for="task-project-select">Project *</label>
+                    <select id="task-project-select" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="task-title-input">Task Title *</label>
+                    <input type="text" id="task-title-input" class="form-control" required placeholder="e.g. Implement user login">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-status-select">Status</label>
+                        <select id="task-status-select" class="form-control">
+                            <option value="TODO">To Do</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="DONE">Done</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-priority-select">Priority</label>
+                        <select id="task-priority-select" class="form-control">
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM" selected>Medium</option>
+                            <option value="HIGH">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-duedate-input">Due Date *</label>
+                        <input type="date" id="task-duedate-input" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-assignee-select">Assigned To</label>
+                        <select id="task-assignee-select" class="form-control">
+                            <option value="">Unassigned</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="task-error" class="alert alert-error hidden"></div>
+                <button type="submit" class="btn btn-primary btn-block">Save Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Comments Drawer -->
+    <div id="comments-drawer" class="drawer-backdrop hidden">
+        <div class="drawer-panel glass">
+            <div class="drawer-header">
+                <div>
+                    <span class="badge badge-primary" id="comment-task-status">Status</span>
+                    <h3 id="comment-task-title">Task Title</h3>
+                </div>
+                <button class="modal-close" onclick="closeModal('comments-drawer')">&times;</button>
+            </div>
+
+            <div class="drawer-body">
+                <div class="task-detail-meta">
+                    <p><strong>Project:</strong> <span id="comment-task-project">Project Name</span></p>
+                    <p><strong>Assignee:</strong> <span id="comment-task-assignee">Assignee</span></p>
+                    <p><strong>Due Date:</strong> <span id="comment-task-duedate">Due Date</span></p>
+                </div>
+
+                <hr class="divider">
+                <h4>Comments</h4>
+                
+                <div id="comments-list" class="comments-list">
+                    <!-- Comments loaded dynamically -->
+                </div>
+            </div>
+
+            <div class="drawer-footer">
+                <form id="comment-form">
+                    <input type="hidden" id="comment-task-id">
+                    <div class="comment-input-row">
+                        <input type="text" id="comment-body-input" class="form-control" placeholder="Add a comment..." required>
+                        <button type="submit" class="btn btn-primary">Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Action Modal -->
+    <div id="confirm-modal" class="modal-backdrop hidden">
+        <div class="modal-card glass" style="max-width: 420px; text-align: center;">
+            <div style="font-size: 42px; margin-bottom: 12px;">⚠️</div>
+            <h2 id="confirm-modal-title" style="margin-bottom: 8px; font-size: 20px;">Confirm Action</h2>
+            <p id="confirm-modal-msg" style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.5;">Are you sure you want to proceed?</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="confirm-modal-cancel" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                <button id="confirm-modal-ok" class="btn btn-danger" style="flex: 1;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden">
+        <span id="toast-icon" class="toast-icon">ℹ️</span>
+        <span id="toast-text">Notification message</span>
+    </div>
+
+    <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

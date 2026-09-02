@@ -2,6 +2,12 @@ from django.urls import path
 from task import views
 
 urlpatterns = [
+    # Frontend Single Page Interface
+    path('', views.index_view, name='index'),
+
+    # Dashboard API
+    path('api/dashboard/', views.api_dashboard, name='api_dashboard'),
+
     # Auth API
     path('api/auth/register/', views.api_register, name='api_register'),
     path('api/auth/login/', views.api_login, name='api_login'),
