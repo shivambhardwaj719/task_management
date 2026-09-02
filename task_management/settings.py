@@ -1,15 +1,18 @@
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-m&+8@^d_n!=@zjst_^edbdj-oi(4_!njq@g47ak*iup=l!1iok')
 
-SECRET_KEY = 'django-insecure-m&+8@^d_n!=@zjst_^edbdj-oi(4_!njq@g47ak*iup=l!1iok'
+DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
 
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
-
+allowed_hosts_raw = os.getenv('ALLOWED_HOSTS', '*')
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_raw.split(',') if host.strip()]
 
 
 INSTALLED_APPS = [
@@ -53,15 +56,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'task_management.wsgi.application'
 
 
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'task_management',
-        'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),
+        'NAME': os.getenv('DB_NAME', 'task_management'),
+        'USER': os.getenv('DB_USER', 'root'),
+        'PASSWORD': os.getenv('DB_PASSWORD', '123456'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
@@ -101,4 +103,3 @@ STATICFILES_DIRS = [
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
