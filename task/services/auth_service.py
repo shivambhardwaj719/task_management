@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from utils.response.messages import ResponseMessages
+from task.utils.response.messages import ResponseMessages
 from django.contrib.auth import authenticate, login, logout
 
 

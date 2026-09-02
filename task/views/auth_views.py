@@ -1,22 +1,14 @@
-import json
-from services.auth_service import AuthService
+from task.services.auth_service import AuthService
 from django.views.decorators.http import require_http_methods
-from utils.response.handlers import (
+from task.utils.response.handlers import (
     success_response,
     bad_request_response,
     unauthorized_response,
 )
 
-from utils.response.messages import ResponseMessages
+from task.utils.response.messages import ResponseMessages
+from task.utils.helpers import parse_json_body
 
-
-def parse_json_body(request):
-    if request.body:
-        try:
-            return json.loads(request.body.decode('utf-8'))
-        except json.JSONDecodeError:
-            return None
-    return {}
 
 @require_http_methods(["POST"])
 def api_register(request):
