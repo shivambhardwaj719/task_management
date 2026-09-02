@@ -1,7 +1,7 @@
 from typing import Any, Optional
 import logging
 from django.http import JsonResponse
-from utils.response.messages import ResponseMessages, get_message
+from task.utils.response.messages import ResponseMessages, get_message
 
 logger = logging.getLogger("task_management")
 
